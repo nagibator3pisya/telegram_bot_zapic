@@ -1,10 +1,5 @@
 import logging
-from typing import List
-
 from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
-from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
@@ -27,7 +22,7 @@ class Settings(BaseSettings):
     )
 
     def get_db_url(self):
-        return (f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}"
+        return (f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}@"
                 f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}")
 
 
@@ -41,6 +36,7 @@ bot = Bot(token=settings.BOT_TOKEN)
 bd = Dispatcher()
 
 database_url = settings.get_db_url()
+print(database_url)
 
 
 
