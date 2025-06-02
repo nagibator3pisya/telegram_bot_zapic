@@ -1,11 +1,11 @@
-from aiogram import types
+from aiogram import types, Router
 from aiogram.filters import Command
 
 from Config.config import bd, logger
 from bot.Dao.ModelDao import ProfileDao, UserDao
+start_router = Router()
 
-
-@bd.message(Command('start'))
+@start_router.message(Command('start'))
 async def start_bot(message: types.Message):
     telegram_id = message.from_user.id
     first_name = message.from_user.first_name

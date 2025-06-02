@@ -1,4 +1,3 @@
-from Config.config import async_session_maker
 from bot.Dao.BaseDao import BaseDAO
 from bot.models.model import User, Service, Master, Application, Profile
 
@@ -8,18 +7,14 @@ class UserDao(BaseDAO):
 
 
     @classmethod
-    async def register_user(cls, telegram_id: int, first_name: str, last_name: str, username: str):
-        async with async_session_maker() as session:
-            async with session.begin():
-                user = cls.model(
-                    telegram_id=telegram_id,
-                    first_name=first_name,
-                    last_name=last_name,
-                    username=username
-                )
-                session.add(user)
-                await session.commit()
-                return user
+    async  def register_user(cls,telegram_id:int,first_name:str,last_name:str,username:str):
+        user_data={
+            'telegram_id': telegram_id,
+            'first_name':first_name,
+            'last_name':last_name,
+            'username':username
+        }
+        return await cls.create(**user_data)
 
 class ProfileDao(BaseDAO):
     model = Profile
