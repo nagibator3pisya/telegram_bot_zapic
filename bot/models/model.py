@@ -6,36 +6,34 @@ from sqlalchemy.orm import mapped_column
 from bot.models.Basemodel import Base
 
 class User(Base):
-    """
-    Таблица users хранит данные о пользователях Telegram
-    """
     __tablename__ = 'users'
-    telegram_id : Mapped[int] = mapped_column(BigInteger,primary_key = True )
-    first_name: Mapped[str] = mapped_column(String(50),nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
+    first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
-    username: Mapped[str] = mapped_column(String(50),nullable=False)
-    # один юз имеет несклько связь с заявками
+    username: Mapped[str] = mapped_column(String(50), nullable=False)
     applications: Mapped['Application'] = relationship(back_populates='user')
+    profile = relationship("Profile", back_populates="user", uselist=False)
+
+class Profile(Base):
+    __tablename__ = 'profile'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    first_name: Mapped[str] = mapped_column(String(50), nullable=True)
+    last_name: Mapped[str] = mapped_column(String(50), nullable=True)
+    user = relationship("User", back_populates="profile")
 
 class Service(Base):
-    """
-    Таблица services содержит информацию об услугах,
-    """
     __tablename__ = 'service'
-
-    service_id : Mapped[int] = mapped_column(Integer,primary_key = True,autoincrement=True)
-    service_name: Mapped[str] = mapped_column(String(40),nullable = False)
-
+    service_id: Mapped[int] = mapped_column(Integer, primary_key=True,)
+    service_name: Mapped[str] = mapped_column(String(40), nullable=False)
     applications: Mapped["Application"] = relationship(back_populates="service")
 
 class Master(Base):
     __tablename__ = 'masters'
-    master_id:Mapped[int] = mapped_column(Integer,primary_key = True,autoincrement=True)
-    master_name: Mapped[str] = mapped_column(String(50),nullable = False)
-    # один мастер может иметь несколько заявок
-    applications: Mapped['Application']  = relationship(back_populates='master')
-
-
+    master_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    master_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    applications: Mapped['Application'] = relationship(back_populates='master')
 
 class Application(Base):
     __tablename__ = 'applications'
@@ -43,11 +41,9 @@ class Application(Base):
     client_name: Mapped[str] = mapped_column(String(40), nullable=False)
     appointment_date: Mapped[Date] = mapped_column(Date, nullable=False)
     appointment_time: Mapped[Time] = mapped_column(Time, nullable=False)
-    # связи
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.telegram_id'))
-    master_id: Mapped[int] = mapped_column(Integer, ForeignKey('masters.master_id'))  # Внешний ключ на мастера
-    service_id: Mapped[int] = mapped_column(Integer, ForeignKey('service.service_id'))  # Внешний ключ на услугу
-
+    master_id: Mapped[int] = mapped_column(Integer, ForeignKey('masters.master_id'))
+    service_id: Mapped[int] = mapped_column(Integer, ForeignKey('service.service_id'))
     user: Mapped["User"] = relationship(back_populates="applications")
     master: Mapped["Master"] = relationship(back_populates="applications")
     service: Mapped["Service"] = relationship(back_populates="applications")

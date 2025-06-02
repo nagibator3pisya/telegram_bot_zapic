@@ -5,6 +5,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+#
+# from bot.main import start_router
 
 load_dotenv()
 
@@ -34,6 +36,10 @@ logger = logging.getLogger(__name__)
 
 bot = Bot(token=settings.BOT_TOKEN)
 bd = Dispatcher()
+
+# Регистрация роутеров
+# bd.include_router(start_router)
+
 
 database_url = settings.get_db_url()
 print(database_url)
