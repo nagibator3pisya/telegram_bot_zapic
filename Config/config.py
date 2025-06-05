@@ -1,13 +1,12 @@
 import logging
+from typing import List
+
 from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-#
-# from bot.main import start_router
-
 load_dotenv()
 
 
@@ -18,7 +17,7 @@ class Settings(BaseSettings):
     DB_PORT: int
     DB_NAME: str
     BOT_TOKEN: str
-    ID_ADMIN:int
+    ID_ADMIN:List[int]
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
     )
@@ -37,8 +36,7 @@ logger = logging.getLogger(__name__)
 bot = Bot(token=settings.BOT_TOKEN)
 bd = Dispatcher()
 
-# Регистрация роутеров
-# bd.include_router(start_router)
+
 
 
 database_url = settings.get_db_url()

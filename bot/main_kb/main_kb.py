@@ -1,40 +1,19 @@
-from aiogram import types, Router
+from aiogram import types
 from aiogram.filters import Command
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
-from Config.config import bd, logger
-from bot.Dao.ModelDao import ProfileDao, UserDao
-start_router = Router()
+from Config.config import settings
 
-@start_router.message(Command('start'))
-async def start_bot(message: types.Message):
-    try:
-        telegram_id = message.from_user.id
-        first_name = message.from_user.first_name
-        last_name = message.from_user.last_name
-        username = message.from_user.username
 
-        logger.info(f"Получены данные пользователя: {telegram_id}, {first_name}, {last_name}, {username}")
+def main_kb(user_id):
+    kb_list_main = [
+        [KeyboardButton(text="📖 О нас"), KeyboardButton(text="👤 Профиль")],
+        [KeyboardButton(text="📝 Заполнить заявку"), KeyboardButton(text="📚 Мастера")]
+    ]
+    if user_id in settings.ID_ADMIN:
+        kb_list_main.append([KeyboardButton(text="⚙️ Админ панель")])
+    keyboard = ReplyKeyboardMarkup(keyboard=kb_list_main, resize_keyboard=True, one_time_keyboard=True)
+    return keyboard
 
-        # Регистрация пользователя
-        user = await UserDao.register_user(
-            telegram_id=telegram_id,
-            first_name=first_name,
-            last_name=last_name,
-            username=username
-        )
-        logger.info(f"Пользователь зарегистрирован: {user}")
 
-        # Регистрация профиля
-        profile = await ProfileDao.register_profile(
-            user_id=user.id,
-            first_name=first_name,
-            last_name=last_name
-        )
-        logger.info(f"Профиль создан: {profile}")
-
-        await message.answer('Добро пожаловать!')
-
-    except Exception as e:
-        logger.error(f"Произошла ошибка: {e}", exc_info=True)
-        await message.answer('Произошла ошибка при регистрации.')
 
