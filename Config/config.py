@@ -43,8 +43,5 @@ bd = Dispatcher()
 
 database_url = settings.get_db_url()
 print(database_url)
-
-
-
 engine = create_async_engine(url=database_url)
-async_session_maker = async_sessionmaker(engine, class_=AsyncSession)
+async_session_maker = async_sessionmaker(engine, class_=AsyncSession,expire_on_commit=False)

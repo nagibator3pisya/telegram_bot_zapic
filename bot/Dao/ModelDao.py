@@ -1,3 +1,4 @@
+from Config.config import logger
 from bot.Dao.BaseDao import BaseDAO
 from bot.models.model import User, Service, Master, Application, Profile
 
@@ -9,7 +10,7 @@ class UserDao(BaseDAO):
     @classmethod
     async  def register_user(cls,telegram_id:int,first_name:str,last_name:str,username:str):
         user_data={
-            'telegram_id': telegram_id,
+            'telegram_id':telegram_id,
             'first_name':first_name,
             'last_name':last_name,
             'username':username
@@ -20,12 +21,13 @@ class ProfileDao(BaseDAO):
     model = Profile
 
     @classmethod
-    async  def register_profile(cls,user_id:int,first_name:str, last_name:str):
+    async def register_profile(cls, user_id: int, first_name: str, last_name: str):
         profile_data = {
-            'user_id':user_id,
-            'first_name':first_name,
-            'last_name':last_name
+            'user_id': user_id,
+            'first_name': first_name,
+            'last_name': last_name
         }
+        logger.info(f"Создание профиля с данными: {profile_data}")
         return await cls.create(**profile_data)
 
 

@@ -1,13 +1,14 @@
-from datetime import datetime
+from typing import List
+
 from sqlalchemy import BigInteger, String, Integer, Date, Time, ForeignKey
 from sqlalchemy.orm import Mapped, relationship
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.testing.schema import mapped_column
 
 from bot.models.Basemodel import Base
 
+
 class User(Base):
     __tablename__ = 'users'
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -17,33 +18,31 @@ class User(Base):
 
 class Profile(Base):
     __tablename__ = 'profile'
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     first_name: Mapped[str] = mapped_column(String(50), nullable=True)
     last_name: Mapped[str] = mapped_column(String(50), nullable=True)
     user = relationship("User", back_populates="profile")
 
 class Service(Base):
-    __tablename__ = 'service'
-    service_id: Mapped[int] = mapped_column(Integer, primary_key=True,)
+    __tablename__ = 'services'
     service_name: Mapped[str] = mapped_column(String(40), nullable=False)
-    applications: Mapped["Application"] = relationship(back_populates="service")
+    applications: Mapped[list["Application"]] = relationship(back_populates="service")
 
 class Master(Base):
     __tablename__ = 'masters'
-    master_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    master_id: Mapped[int] = mapped_column(Integer, unique=True)
     master_name: Mapped[str] = mapped_column(String(50), nullable=False)
-    applications: Mapped['Application'] = relationship(back_populates='master')
+    applications: Mapped[List['Application']] = relationship(back_populates='master')
 
 class Application(Base):
     __tablename__ = 'applications'
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     client_name: Mapped[str] = mapped_column(String(40), nullable=False)
     appointment_date: Mapped[Date] = mapped_column(Date, nullable=False)
     appointment_time: Mapped[Time] = mapped_column(Time, nullable=False)
-    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.telegram_id'))
-    master_id: Mapped[int] = mapped_column(Integer, ForeignKey('masters.master_id'))
-    service_id: Mapped[int] = mapped_column(Integer, ForeignKey('service.service_id'))
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    master_id: Mapped[int] = mapped_column(Integer, ForeignKey('masters.id'))
+    service_id: Mapped[int] = mapped_column(Integer, ForeignKey('services.id'))
+
     user: Mapped["User"] = relationship(back_populates="applications")
     master: Mapped["Master"] = relationship(back_populates="applications")
     service: Mapped["Service"] = relationship(back_populates="applications")

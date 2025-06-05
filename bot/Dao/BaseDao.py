@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 
 from Config.config import async_session_maker
 from Connect_sql.connect import connection
@@ -8,12 +9,15 @@ class BaseDAO:
     model = None
 
     @classmethod
-    async def create(cls, data):
+    async def create(cls, **data):
         async with async_session_maker() as session:
-            async with session.begin():
                 instance = cls.model(**data)
                 session.add(instance)
-                await session.commit()
+                try:
+                    await session.commit()
+                except SQLAlchemyError as e:
+                    await session.rollback()
+                    raise e
                 return instance
 
     @classmethod
