@@ -17,6 +17,13 @@ class UserDao(BaseDAO):
         }
         return await cls.create(**user_data)
 
+    @classmethod
+    async def check_profile(cls, telegram_id: int):
+        logger.info(f"Проверка профиля с telegram_id: {telegram_id}")
+        user_profile = await cls.find_one_or_none_by_id(data_id=telegram_id)
+        logger.info(f"Результат проверки профиля: {user_profile}")
+        return user_profile
+
 class ProfileDao(BaseDAO):
     model = Profile
 
@@ -29,6 +36,8 @@ class ProfileDao(BaseDAO):
         }
         logger.info(f"Создание профиля с данными: {profile_data}")
         return await cls.create(**profile_data)
+
+
 
 
 class MasterDao(BaseDAO):

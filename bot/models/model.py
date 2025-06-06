@@ -23,6 +23,8 @@ class Profile(Base):
     last_name: Mapped[str] = mapped_column(String(50), nullable=True)
     user = relationship("User", back_populates="profile")
 
+
+
 class Service(Base):
     __tablename__ = 'services'
     service_name: Mapped[str] = mapped_column(String(40), nullable=False)

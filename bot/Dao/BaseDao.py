@@ -12,20 +12,9 @@ class BaseDAO:
     async def create(cls, **data):
         async with async_session_maker() as session:
             try:
-                # Проверка на запись создана или нет
-                unique_field = next(iter(data))  # +- поле уникальное
-                existing_instance = await session.execute(
-                    select(cls.model).filter_by(**{unique_field: data[unique_field]})
-                )
-                existing_instance = existing_instance.scalar_one_or_none()
-
-                if existing_instance:
-                    return existing_instance
-
-                # Если записи нет, создаем новую
                 instance = cls.model(**data)
                 session.add(instance)
-                await session.commit()
+                await session.commit()  # Убедитесь, что сессия фиксируется
                 return instance
             except SQLAlchemyError as e:
                 await session.rollback()
