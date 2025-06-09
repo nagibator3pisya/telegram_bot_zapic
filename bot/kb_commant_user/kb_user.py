@@ -12,7 +12,7 @@ user_router = Router()
 async def get_profile(message: Message):
     telegram_id = message.from_user.id
     logger.info(f"Получение профиля для telegram_id: {telegram_id}")
-    user_profile = await UserDao.check_profile(telegram_id=telegram_id)
+    user_profile = await UserDao.find_one_or_none(telegram_id=telegram_id)
 
     if user_profile:
         profile_info = (
