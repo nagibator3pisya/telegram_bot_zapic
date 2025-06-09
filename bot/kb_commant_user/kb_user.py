@@ -1,6 +1,6 @@
 from aiogram import Router, types, F
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 
 from Config.config import logger
 from bot.Dao.ModelDao import ProfileDao, UserDao
@@ -24,3 +24,13 @@ async def get_profile(message: Message):
         await message.answer(profile_info)
     else:
         await message.answer('Профиль не найден.')
+
+
+
+def check_data():
+    kb_list = [
+        [InlineKeyboardButton(text="✅Все верно", callback_data='correct')],
+        [InlineKeyboardButton(text="❌Заполнить сначала", callback_data='incorrect')]
+    ]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=kb_list)
+    return keyboard

@@ -39,6 +39,7 @@ class Master(Base):
 class Application(Base):
     __tablename__ = 'applications'
     client_name: Mapped[str] = mapped_column(String(40), nullable=False)
+    client_surname: Mapped[str] = mapped_column(String(40))
     appointment_date: Mapped[Date] = mapped_column(Date, nullable=False)
     appointment_time: Mapped[Time] = mapped_column(Time, nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
