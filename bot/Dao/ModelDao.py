@@ -12,12 +12,11 @@ class UserDao(BaseDAO):
 
     @classmethod
     async def register_user(cls, telegram_id: int, first_name: str, last_name: str, username: str):
-        # Check if the user already exists
+        # проверка есть ли такой id
         existing_user = await cls.find_one_or_none(telegram_id=telegram_id)
         if existing_user:
             return existing_user
-
-        # If the user does not exist, create a new user
+        # add нового
         user_data = {
             'telegram_id': telegram_id,
             'first_name': first_name,
@@ -34,12 +33,11 @@ class ProfileDao(BaseDAO):
 
     @classmethod
     async def register_profile(cls, user_id: int, first_name: str, last_name: str):
-        # Check if the profile already exists
+
         existing_profile = await cls.find_one_or_none(user_id=user_id)
         if existing_profile:
             return existing_profile
 
-        # If the profile does not exist, create a new profile
         profile_data = {
             'user_id': user_id,
             'first_name': first_name,
