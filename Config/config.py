@@ -2,6 +2,7 @@ import logging
 from typing import List
 
 from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
@@ -32,9 +33,9 @@ settings = Settings()
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
+storage = MemoryStorage()
 bot = Bot(token=settings.BOT_TOKEN)
-bd = Dispatcher()
+bd = Dispatcher(storage=storage)
 
 
 
