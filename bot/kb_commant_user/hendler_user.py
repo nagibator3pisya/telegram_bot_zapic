@@ -56,14 +56,8 @@ async def save_data(call: CallbackQuery, state: FSMContext):
 @handled_user_router.callback_query(F.data == 'incorrect', Form.check_state)
 async def restart_questionnaire(call: CallbackQuery, state: FSMContext):
     await call.answer('Запускаем сценарий с начала')
-
-    # Удаляем текущую клавиатуру
     await call.message.edit_reply_markup(reply_markup=None)
-
-    # Отправляем новое сообщение с началом процесса
     await call.message.answer('Введите ваше Имя!')
-
-    # Обновляем состояние
     await state.set_state(Form.client_name)
 
 
