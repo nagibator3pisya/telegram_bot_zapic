@@ -1,16 +1,17 @@
 from aiogram import Router, types, F
 from aiogram.filters import Command
-from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from Config.config import logger
 from bot.Dao.ModelDao import ProfileDao, UserDao
 
 user_router = Router()
 
-@user_router.message(Command('profile'))
-@user_router.message(F.text.contains('Профиль'))
-async def get_profile(message: Message):
-    telegram_id = message.from_user.id
+
+@user_router.callback_query(F.data == 'profile')
+async def get_profile(call: CallbackQuery):
+    telegram_id = call.from_user.id
     logger.info(f"Получение профиля для telegram_id: {telegram_id}")
     user_profile = await UserDao.find_one_or_none(telegram_id=telegram_id)
 
@@ -21,9 +22,17 @@ async def get_profile(message: Message):
             f'Фамилия: {user_profile.last_name}\n'
             f'Username: {user_profile.username}'
         )
-        await message.answer(profile_info)
+        kb_back = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text='Назад', callback_data='home')]
+        ])
+
+        await call.message.edit_text(profile_info,reply_markup=kb_back)
     else:
-        await message.answer('Профиль не найден.')
+        await call.answer('Профиль не найден.')
+
+
+
+
 
 
 

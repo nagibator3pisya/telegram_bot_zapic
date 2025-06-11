@@ -34,7 +34,7 @@ async def start_bot(message: types.Message):
         )
         logger.info(f"Профиль создан: {profile}")
 
-        await message.answer('Добро пожаловать!',reply_markup=main_kb(user_id=telegram_id))
+        await message.answer('Добро пожаловать!\n\n↙️ Выберите нужное меню ↘️',reply_markup=main_kb(user_id=telegram_id))
 
     except Exception as e:
         logger.error(f"Произошла ошибка: {e}", exc_info=True)

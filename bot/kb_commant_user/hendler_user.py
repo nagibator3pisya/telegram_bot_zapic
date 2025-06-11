@@ -6,14 +6,15 @@ from aiogram.types import Message, CallbackQuery
 from Config.config import bd
 from bot.FSM.FSM_anketa import Form
 from bot.kb_commant_user.kb_user import check_data
+from bot.main_kb.main_kb import main_kb
 
 handled_user_router = Router()
 
 
 
-@handled_user_router.message(F.text.contains('Заполнить заявку'))
-async def start_zapic(message: types.Message, state: FSMContext):
-    await message.answer(text='Введите ваше Имя!')
+@handled_user_router.callback_query(F.data == 'fill_application')
+async def start_zapic(call: CallbackQuery, state: FSMContext):
+    await call.message.edit_text(text='Введите ваше Имя!')
     await state.set_state(Form.client_name)
 
 @handled_user_router.message(Form.client_name)
@@ -47,17 +48,22 @@ async def process_correct_time(message: Message, state: FSMContext):
 # Save data
 @handled_user_router.callback_query(F.data == 'correct', Form.check_state)
 async def save_data(call: CallbackQuery, state: FSMContext):
+    user_id = call.from_user.id
     await call.answer('Данные сохранены')
-    await call.message.edit_reply_markup(reply_markup=None)
-    await call.message.answer('Благодарю за регистрацию. Ваши данные успешно сохранены!')
+    await call.message.answer('↙️ Выберите нужное меню ↘️',reply_markup=main_kb(user_id))
     await state.clear()
 
-# Restart the questionnaire
 @handled_user_router.callback_query(F.data == 'incorrect', Form.check_state)
 async def restart_questionnaire(call: CallbackQuery, state: FSMContext):
     await call.answer('Запускаем сценарий с начала')
+
+    # Удаляем текущую клавиатуру
     await call.message.edit_reply_markup(reply_markup=None)
+
+    # Отправляем новое сообщение с началом процесса
     await call.message.answer('Введите ваше Имя!')
+
+    # Обновляем состояние
     await state.set_state(Form.client_name)
 
 

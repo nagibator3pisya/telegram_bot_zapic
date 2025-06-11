@@ -1,19 +1,32 @@
 from aiogram import types
 from aiogram.filters import Command
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import  InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from Config.config import settings
 
 
 def main_kb(user_id):
-    kb_list_main = [
-        [KeyboardButton(text="📖 О нас"), KeyboardButton(text="👤 Профиль")],
-        [KeyboardButton(text="📝 Заполнить заявку"), KeyboardButton(text="📚 Услуги")]
+
+    kb_Inline_main =[
+        [InlineKeyboardButton(text="📖 О нас",callback_data="about_us")],
+        [InlineKeyboardButton(text="👤 Профиль", callback_data="profile")],
+        [InlineKeyboardButton(text="📝 Заполнить заявку",callback_data="fill_application")],
+        [InlineKeyboardButton(text="📚 Услуги",callback_data="services")]
     ]
     if user_id in settings.ID_ADMIN:
-        kb_list_main.append([KeyboardButton(text="⚙️ Админ панель")])
-    keyboard = ReplyKeyboardMarkup(keyboard=kb_list_main, resize_keyboard=True, one_time_keyboard=True)
+        kb_Inline_main.append([InlineKeyboardButton(text="⚙️ Админ панель",callback_data="admin_panel")])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=kb_Inline_main)
     return keyboard
+
+
+
+
+
+
+def home_bk ():
+    kb_hom = InlineKeyboardBuilder()
+    kb_hom.button(text="🏠 На главную", callback_data="home")
 
 
 
