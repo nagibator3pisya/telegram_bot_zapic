@@ -28,7 +28,7 @@ async def start_bot(message: types.Message):
 
         # Регистрация профиля
         profile = await ProfileDao.register_profile(
-            user_id=user.id,
+            user_id=user.telegram_id,
             first_name=first_name,
             last_name=last_name
         )
