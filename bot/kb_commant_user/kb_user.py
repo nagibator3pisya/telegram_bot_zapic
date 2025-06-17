@@ -31,6 +31,12 @@ async def get_profile(call: CallbackQuery):
         await call.answer('Профиль не найден.')
 
 
+def get_time_keyboard():
+    keyboard = InlineKeyboardMarkup()
+    times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"]
+    for time in times:
+        keyboard.add(InlineKeyboardButton(time, callback_data=f"time_selected:{time}"))
+    return keyboard
 
 
 def get_time_keyboard():
