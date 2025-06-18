@@ -64,6 +64,9 @@ class BaseDAO:
                     return instance
                 return None
 
+
+
+
     @classmethod
     async def delete(cls, data_id):
         async with async_session_maker() as session:
