@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from aiogram import Router, types, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -43,13 +45,29 @@ async def process_simple_calendar(callback_query: types.CallbackQuery, callback_
 
 
 
-@handled_user_router.callback_query(lambda call: call.data.startswith("time_selected:"),Form.appointment_time)
+@handled_user_router.callback_query(lambda call: call.data.startswith("time_selected:"), Form.appointment_time)
 async def process_time_selection(call: types.CallbackQuery, state: FSMContext):
-    selected_time = call.data.split(":")[1]
+    selected_time_str = call.data.split(":")[1]
+
+    # Проверяем, содержит ли строка только час, и добавляем ":00", если это так
+    if len(selected_time_str) <= 2:  # Если строка содержит только час
+        selected_time_str += ":00"
+
+    # Преобразуем строку времени в объект времени
+    selected_time = datetime.strptime(selected_time_str, "%H:%M").time()
+
+    # Обновляем состояние с выбранным временем
     await state.update_data(correct_time=selected_time)
+
+    # Получаем данные из состояния
     data = await state.get_data()
+
+    # Форматируем время обратно в строку для отображения
+    formatted_time = selected_time.strftime("%H:%M")
+
     await call.message.answer(
-        text=f'Имя: {data["client_name"]}\nФамилия: {data["client_surname"]}\nДата: {data["appointment_date"]}\nВремя: {selected_time}',
+        text=f'Имя: {data["client_name"]}\nФамилия: {data["client_surname"]}\n'
+             f'Дата: {data["appointment_date"]}\nВремя: {formatted_time}',
         reply_markup=check_data()
     )
 
