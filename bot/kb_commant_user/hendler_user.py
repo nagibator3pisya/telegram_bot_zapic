@@ -99,3 +99,12 @@ async def restart_questionnaire(call: CallbackQuery, state: FSMContext):
     await state.set_state(Form.client_name)
 
 
+
+# application
+@handled_user_router.callback_query(F.data == 'application')
+async def application(call:CallbackQuery):
+    user_id = call.from_user.id
+
+
+
+

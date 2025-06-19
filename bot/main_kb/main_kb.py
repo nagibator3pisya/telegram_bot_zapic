@@ -12,6 +12,7 @@ def main_kb(user_id):
         [InlineKeyboardButton(text="📖 О нас",callback_data="about_us")],
         [InlineKeyboardButton(text="👤 Профиль", callback_data="profile")],
         [InlineKeyboardButton(text="📝 Заполнить заявку",callback_data="fill_application")],
+        [InlineKeyboardButton(text="📝 Мои заявки", callback_data="application")],
         [InlineKeyboardButton(text="📚 Услуги",callback_data="services")]
     ]
     if user_id in settings.ID_ADMIN:
