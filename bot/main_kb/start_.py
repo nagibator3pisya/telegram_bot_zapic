@@ -2,7 +2,7 @@ from aiogram import types, Router
 from aiogram.filters import Command
 
 from Config.config import bd, logger
-from bot.Dao.ModelDao import ProfileDao, UserDao
+from bot.Dao.ModelDao import UserDao
 from bot.main_kb.main_kb import main_kb
 
 start_router = Router()

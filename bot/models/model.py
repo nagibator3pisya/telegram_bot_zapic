@@ -14,15 +14,15 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
     username: Mapped[str] = mapped_column(String(50), nullable=False)
     applications: Mapped['Application'] = relationship(back_populates='user')
-    profile = relationship("Profile", back_populates="user", uselist=False)
+    # profile = relationship("Profile", back_populates="user", uselist=False)
 
-class Profile(Base):
-    __tablename__ = 'profile'
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.telegram_id'))
-    first_name: Mapped[str] = mapped_column(String(50), nullable=True)
-    last_name: Mapped[str] = mapped_column(String(50), nullable=True)
-    user = relationship("User", back_populates="profile")
+# class Profile(Base):
+#     __tablename__ = 'profile'
+#     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+#     user_id: Mapped[int] = mapped_column(ForeignKey('users.telegram_id'))
+#     first_name: Mapped[str] = mapped_column(String(50), nullable=True)
+#     last_name: Mapped[str] = mapped_column(String(50), nullable=True)
+#     user = relationship("User", back_populates="profile")
 
 
 

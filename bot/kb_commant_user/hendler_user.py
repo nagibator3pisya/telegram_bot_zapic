@@ -21,11 +21,14 @@ async def start_zapic(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(text='Введите ваше Имя!')
     await state.set_state(Form.client_name)
 
+
 @handled_user_router.message(Form.client_name)
 async def process_correct_name(message: Message, state: FSMContext):
     await state.update_data(client_name=message.text)
     await message.answer(text='Спасибо!\n\nА теперь введите фамилию')
     await state.set_state(Form.client_surname)
+
+
 
 @handled_user_router.message(Form.client_surname)
 async def process_correct_surname(message: Message, state: FSMContext):
@@ -100,10 +103,6 @@ async def restart_questionnaire(call: CallbackQuery, state: FSMContext):
 
 
 
-# application
-@handled_user_router.callback_query(F.data == 'application')
-async def application(call:CallbackQuery):
-    user_id = call.from_user.id
 
 
 

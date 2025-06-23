@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 
 from Config.config import logger, async_session_maker
 from bot.Dao.BaseDao import BaseDAO
-from bot.models.model import User, Service, Master, Application, Profile
+from bot.models.model import User, Service, Master, Application
 
 
 class UserDao(BaseDAO):
@@ -29,22 +29,22 @@ class UserDao(BaseDAO):
 
 
 
-class ProfileDao(BaseDAO):
-    model = Profile
-
-    @classmethod
-    async def register_profile(cls, user_id: int, first_name: str, last_name: str):
-
-        existing_profile = await cls.find_one_or_none(user_id=user_id)
-        if existing_profile:
-            return existing_profile
-
-        profile_data = {
-            'user_id': user_id,
-            'first_name': first_name,
-            'last_name': last_name
-        }
-        return await cls.create(**profile_data)
+# class ProfileDao(BaseDAO):
+#     model = Profile
+#
+#     @classmethod
+#     async def register_profile(cls, user_id: int, first_name: str, last_name: str):
+#
+#         existing_profile = await cls.find_one_or_none(user_id=user_id)
+#         if existing_profile:
+#             return existing_profile
+#
+#         profile_data = {
+#             'user_id': user_id,
+#             'first_name': first_name,
+#             'last_name': last_name
+#         }
+#         return await cls.create(**profile_data)
 
 
 
