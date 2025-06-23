@@ -25,15 +25,6 @@ async def start_bot(message: types.Message):
             username=username
         )
         logger.info(f"Пользователь зарегистрирован: {user}")
-
-        # Регистрация профиля
-        profile = await ProfileDao.register_profile(
-            user_id=user.telegram_id,
-            first_name=first_name,
-            last_name=last_name
-        )
-        logger.info(f"Профиль создан: {profile}")
-
         await message.answer('Добро пожаловать!\n\n↙️ Выберите нужное меню ↘️',reply_markup=main_kb(user_id=telegram_id))
 
     except Exception as e:
