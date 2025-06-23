@@ -22,17 +22,23 @@ async def start_zapic(call: CallbackQuery, state: FSMContext):
     await state.set_state(Form.client_name)
 
 
+
 @handled_user_router.message(Form.client_name)
 async def process_correct_name(message: Message, state: FSMContext):
     await state.update_data(client_name=message.text)
     await message.answer(text='Спасибо!\n\nА теперь введите фамилию')
     await state.set_state(Form.client_surname)
 
-
-
 @handled_user_router.message(Form.client_surname)
-async def process_correct_surname(message: Message, state: FSMContext):
+async def process_correct_surname(message: types.Message, state: FSMContext):
     await state.update_data(client_surname=message.text)
+    await message.answer(text='Спасибо!\n\nА теперь введите ваш номер телефона')
+    await state.set_state(Form.client_phone)
+
+
+@handled_user_router.message(Form.client_phone)
+async def process_correct_surname(message: Message, state: FSMContext):
+    await state.update_data(client_phone=message.text)
     await message.answer(text='Отлично, теперь выберите дату:', reply_markup=await SimpleCalendar().start_calendar())
     await state.set_state(Form.appointment_date)
 
@@ -69,7 +75,7 @@ async def process_time_selection(call: types.CallbackQuery, state: FSMContext):
     formatted_time = selected_time.strftime("%H:%M")
 
     await call.message.answer(
-        text=f'Имя: {data["client_name"]}\nФамилия: {data["client_surname"]}\n'
+        text=f'Имя: {data["client_name"]}\nФамилия: {data["client_surname"]}\nНомер телефона:{data['client_phone']}\n'
              f'Дата: {data["appointment_date"]}\nВремя: {formatted_time}',
         reply_markup=check_data()
     )
@@ -85,6 +91,7 @@ async def save_data(call: CallbackQuery, state: FSMContext):
     await ApplicationDao.create(
         client_name=data["client_name"],
         client_surname=data["client_surname"],
+        client_phone=data['client_phone'],
         appointment_date=data["appointment_date"],
         appointment_time=data["correct_time"],
         user_id=user_id

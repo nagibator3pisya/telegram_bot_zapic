@@ -43,6 +43,7 @@ class Application(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     client_name: Mapped[str] = mapped_column(String(40), nullable=False)
     client_surname: Mapped[str] = mapped_column(String(40))
+    client_phone: Mapped[int] = mapped_column(BigInteger,nullable=False)
     appointment_date: Mapped[Date] = mapped_column(Date, nullable=False)
     appointment_time: Mapped[Time] = mapped_column(Time, nullable=False)
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('users.telegram_id'))

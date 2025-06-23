@@ -89,6 +89,8 @@ class ApplicationDao(BaseDAO):
                     {
                         "application_id": app.id,
                         'client_name': app.client_name,
+                        'client_surname': app.client_surname,
+                        'client_phone': app.client_phone,
                         "appointment_date": app.appointment_date,
                         "appointment_time": app.appointment_time,
                     }

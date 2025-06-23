@@ -35,8 +35,11 @@ async def application_admin(callback_query: types.CallbackQuery):
 
             response = "Список заявок пользователя:\n\n"
             for app in paginated_applications:
-                response+=(f"ID заявки: {app['application_id']}\n"
+                response+=(
+                    f"ID заявки: {app['application_id']}\n"
                     f"Имя: {app['client_name']}\n"
+                     f"Фамилия: {app['client_surname']}\n"
+                     f"Телефон: {app['client_phone']}\n"
                     f"Дата: {app['appointment_date']}\n"
                     f"Время: {app['appointment_time']}\n\n")
 
