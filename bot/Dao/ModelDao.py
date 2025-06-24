@@ -1,3 +1,5 @@
+from doctest import master
+
 from aiogram.types import Message
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -52,6 +54,12 @@ class UserDao(BaseDAO):
 class MasterDao(BaseDAO):
     model = Master
 
+    @classmethod
+    async def add_master(cls,master_name):
+        master = {
+            'master_name':master_name
+        }
+        await cls.create(**master)
 
 class ServiceDao(BaseDAO):
     model = Service
@@ -124,11 +132,11 @@ class ApplicationDao(BaseDAO):
                     {
                         "application_id": app.id,
                         "user_id": app.user_id,
-                        # "service_name": app.service.service_name,  # Название услуги
-                        # "master_name": app.master.master_name,  # Имя мастера
                         "appointment_date": app.appointment_date,
                         "appointment_time": app.appointment_time,
                         "client_name": app.client_name,  # Имя клиента
+                        'client_surname':app.client_surname,
+                        'client_phone': app.client_phone
 
                     }
                     for app in applications
@@ -136,3 +144,5 @@ class ApplicationDao(BaseDAO):
             except SQLAlchemyError as e:
                 print(f"Error while fetching all applications: {e}")
                 return None
+
+

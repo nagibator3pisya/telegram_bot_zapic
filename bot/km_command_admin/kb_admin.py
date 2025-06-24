@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 def admin_keyboard():
     kb_Inline_main = [
         [InlineKeyboardButton(text="📖 О нас", callback_data="about_us")],
-        [InlineKeyboardButton(text="👤 Добавить мастера", callback_data="profile")],
+        [InlineKeyboardButton(text="👤 Добавить мастера", callback_data="add_master_admin")],
         [InlineKeyboardButton(text="📝 Просмотр заявок", callback_data="application_admin")],
         [InlineKeyboardButton(text="📚 Добавить услуги сервиса", callback_data="services_admin")],
         [InlineKeyboardButton(text="🏠 На главную", callback_data="home")]
@@ -48,3 +48,9 @@ def paginate_admin(items, page_size, page):
     start = page * page_size
     end = start + page_size
     return items[start:end]
+
+
+def cancel_kb_inline() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.button(text="Отмена", callback_data="cancel")
+    return kb.as_markup()

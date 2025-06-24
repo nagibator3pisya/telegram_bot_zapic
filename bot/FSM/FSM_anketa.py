@@ -10,4 +10,8 @@ class Form(StatesGroup):
     check_state = State()
 
 
+class Form_Master(StatesGroup):
+    master_name = State()
+
+
 

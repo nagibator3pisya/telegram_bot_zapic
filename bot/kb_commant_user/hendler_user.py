@@ -11,16 +11,24 @@ from Config.config import bd
 from bot.Dao.ModelDao import ApplicationDao
 from bot.FSM.FSM_anketa import Form
 from bot.FSM.Pandantic_valid import ClientNameModel, ClientSurnameModel, ClientPhoneModel
-from bot.kb_commant_user.kb_user import check_data, get_time_keyboard, paginate, get_pagination_keyboard
+from bot.kb_commant_user.kb_user import check_data, get_time_keyboard, paginate, get_pagination_keyboard, \
+    cancel_kb_inline_user
 from bot.main_kb.main_kb import main_kb
 
 handled_user_router = Router()
 
+@handled_user_router.callback_query(F.data == "cancel")
+async def cancel_kb_inline(call: CallbackQuery,state:FSMContext):
+    user_id = call.from_user.id
+    await state.clear()
+    await call.answer('Отмена..')
+    await call.message.delete()
+    await call.message.answer(text='Выберите необходимое действие',reply_markup=main_kb(user_id))
 
 
 @handled_user_router.callback_query(F.data == 'fill_application')
 async def start_zapic(call: CallbackQuery, state: FSMContext):
-    await call.message.edit_text(text='Введите ваше Имя!')
+    await call.message.edit_text(text='Введите ваше Имя!',reply_markup=cancel_kb_inline_user())
     await state.set_state(Form.client_name)
 
 
@@ -30,7 +38,7 @@ async def process_correct_name(message: Message, state: FSMContext):
     try:
         client_name = ClientNameModel(name=message.text)
         await state.update_data(client_name=client_name.name)
-        await message.answer(text='Спасибо!\n\nА теперь введите фамилию')
+        await message.answer(text='Спасибо!\n\nА теперь введите фамилию',reply_markup=cancel_kb_inline_user())
         await state.set_state(Form.client_surname)
     except ValidationError as e:
         await message.answer(f"{e}")
@@ -41,7 +49,7 @@ async def process_correct_surname(message: types.Message, state: FSMContext):
     try:
         client_surname = ClientSurnameModel(surname=message.text)
         await state.update_data(client_surname=client_surname.surname)
-        await message.answer(text='Спасибо!\n\nА теперь введите ваш номер телефона')
+        await message.answer(text='Спасибо!\n\nА теперь введите ваш номер телефона',reply_markup=cancel_kb_inline_user())
         await state.set_state(Form.client_phone)
     except ValidationError as e:
         await message.answer(f"Фамилия должно содержать только буквы")
@@ -126,6 +134,11 @@ async def restart_questionnaire(call: CallbackQuery, state: FSMContext):
 
 @handled_user_router.callback_query(F.data == "application")
 async def application_admin(callback_query: types.CallbackQuery):
+    """
+    Пагинация
+    :param callback_query:
+    :return:
+    """
     user_id = callback_query.from_user.id
 
     page_size = 1  # Количество заявок на одной странице

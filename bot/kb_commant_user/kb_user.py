@@ -47,3 +47,9 @@ def get_pagination_keyboard(current_page: int, total_pages: int):
         kb.button(text="Вперед ➡️", callback_data=f"page_{current_page + 1}")
     kb.adjust(3)
     return kb.as_markup()
+
+
+def cancel_kb_inline_user() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.button(text="Отмена", callback_data="cancel")
+    return kb.as_markup()
