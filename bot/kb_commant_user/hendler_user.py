@@ -5,10 +5,12 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from aiogram_calendar import SimpleCalendar, SimpleCalendarCallback
+from pydantic import ValidationError
 
 from Config.config import bd
 from bot.Dao.ModelDao import ApplicationDao
 from bot.FSM.FSM_anketa import Form
+from bot.FSM.Pandantic_valid import ClientNameModel, ClientSurnameModel, ClientPhoneModel
 from bot.kb_commant_user.kb_user import check_data, get_time_keyboard
 from bot.main_kb.main_kb import main_kb
 
@@ -25,23 +27,35 @@ async def start_zapic(call: CallbackQuery, state: FSMContext):
 
 @handled_user_router.message(Form.client_name)
 async def process_correct_name(message: Message, state: FSMContext):
-    await state.update_data(client_name=message.text)
-    await message.answer(text='Спасибо!\n\nА теперь введите фамилию')
-    await state.set_state(Form.client_surname)
+    try:
+        client_name = ClientNameModel(name=message.text)
+        await state.update_data(client_name=client_name.name)
+        await message.answer(text='Спасибо!\n\nА теперь введите фамилию')
+        await state.set_state(Form.client_surname)
+    except ValidationError as e:
+        await message.answer(f"{e}")
+
 
 @handled_user_router.message(Form.client_surname)
 async def process_correct_surname(message: types.Message, state: FSMContext):
-    await state.update_data(client_surname=message.text)
-    await message.answer(text='Спасибо!\n\nА теперь введите ваш номер телефона')
-    await state.set_state(Form.client_phone)
+    try:
+        client_surname = ClientSurnameModel(surname=message.text)
+        await state.update_data(client_surname=client_surname.surname)
+        await message.answer(text='Спасибо!\n\nА теперь введите ваш номер телефона')
+        await state.set_state(Form.client_phone)
+    except ValidationError as e:
+        await message.answer(f"Фамилия должно содержать только буквы")
 
 
 @handled_user_router.message(Form.client_phone)
 async def process_correct_surname(message: Message, state: FSMContext):
-    await state.update_data(client_phone=message.text)
-    await message.answer(text='Отлично, теперь выберите дату:', reply_markup=await SimpleCalendar().start_calendar())
-    await state.set_state(Form.appointment_date)
-
+    try:
+        client_phone = ClientPhoneModel(phone=message.text)
+        await state.update_data(client_phone=client_phone.phone)
+        await message.answer(text='Отлично, теперь выберите дату:', reply_markup=await SimpleCalendar().start_calendar())
+        await state.set_state(Form.appointment_date)
+    except ValidationError as e:
+        await message.answer(f"Номер телефона должен быть в правильном формате!")
 
 @handled_user_router.callback_query(SimpleCalendarCallback.filter(), Form.appointment_date)
 async def process_simple_calendar(callback_query: types.CallbackQuery, callback_data: dict, state: FSMContext):
