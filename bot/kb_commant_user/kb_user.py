@@ -37,24 +37,13 @@ def paginate(items, page_size, page):
     end = start + page_size
     return items[start:end]
 
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
 def get_pagination_keyboard(current_page: int, total_pages: int):
     # Создаем список для кнопок
-    keyboard_buttons = []
 
-    keyboard_buttons.append([InlineKeyboardButton(text='Меню', callbacks_data="home")])
-
-    # Кнопка "Назад", если текущая страница не первая
-    if current_page > 0:
-        keyboard_buttons.append([InlineKeyboardButton(text ="⬅️ Назад", callback_data=f"page_{current_page - 1}")])
-
-
-
-    # Кнопка "Вперед", если текущая страница не последняя
+    kb = InlineKeyboardBuilder()
+    kb.button(text="⬅️ Назад", callback_data=f"page_{current_page - 1}")
+    kb.button(text='Меню', callback_data="home")
     if current_page < total_pages - 1:
-        keyboard_buttons.append([InlineKeyboardButton(text ="Вперед ➡️", callback_data=f"page_{current_page + 1}")])
-
-    # Создаем клавиатуру с кнопками
-    keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
-    return keyboard
+        kb.button(text="Вперед ➡️", callback_data=f"page_{current_page + 1}")
+    kb.adjust(3)
+    return kb.as_markup()
