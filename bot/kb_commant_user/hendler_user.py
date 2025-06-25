@@ -28,7 +28,8 @@ async def cancel_kb_inline(call: CallbackQuery,state:FSMContext):
 
 @handled_user_router.callback_query(F.data == 'fill_application')
 async def start_zapic(call: CallbackQuery, state: FSMContext):
-    await call.message.edit_text(text='Введите ваше Имя!',reply_markup=cancel_kb_inline_user())
+    msg = await call.message.edit_text(text='Введите ваше Имя!',reply_markup=cancel_kb_inline_user())
+    await state.update_data(last_msg_id=msg.message_id)
     await state.set_state(Form.client_name)
 
 
@@ -38,7 +39,14 @@ async def process_correct_name(message: Message, state: FSMContext):
     try:
         client_name = ClientNameModel(name=message.text)
         await state.update_data(client_name=client_name.name)
-        await message.answer(text='Спасибо!\n\nА теперь введите фамилию',reply_markup=cancel_kb_inline_user())
+        data = await state.get_data()
+        last_msg_id = data.get('last_msg_id')
+        if last_msg_id:
+            await message.bot.delete_message(chat_id=message.chat.id, message_id=last_msg_id)
+
+        new_message = await message.answer(text='Спасибо!\n\nА теперь введите фамилию',
+                                           reply_markup=cancel_kb_inline_user())
+        await state.update_data(last_msg_id=new_message.message_id)
         await state.set_state(Form.client_surname)
     except ValidationError as e:
         await message.answer(f"{e}")
@@ -49,7 +57,15 @@ async def process_correct_surname(message: types.Message, state: FSMContext):
     try:
         client_surname = ClientSurnameModel(surname=message.text)
         await state.update_data(client_surname=client_surname.surname)
-        await message.answer(text='Спасибо!\n\nА теперь введите ваш номер телефона',reply_markup=cancel_kb_inline_user())
+        data = await state.get_data()
+        last_msg_id = data.get('last_msg_id')
+        if last_msg_id:
+            await message.bot.delete_message(chat_id=message.chat.id, message_id=last_msg_id)
+
+            # Отправляем новое сообщение с клавиатурой отмены
+        new_message = await message.answer(text='Спасибо!\n\nА теперь введите ваш номер телефона',
+                                               reply_markup=cancel_kb_inline_user())
+        await state.update_data(last_msg_id=new_message.message_id)
         await state.set_state(Form.client_phone)
     except ValidationError as e:
         await message.answer(f"Фамилия должно содержать только буквы")
