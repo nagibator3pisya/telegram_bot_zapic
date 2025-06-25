@@ -39,10 +39,15 @@ async def process_correct_name(message: Message, state: FSMContext):
     try:
         client_name = ClientNameModel(name=message.text)
         await state.update_data(client_name=client_name.name)
+        # Удаляем кнопки из предыдущего сообщения
         data = await state.get_data()
         last_msg_id = data.get('last_msg_id')
         if last_msg_id:
-            await message.bot.delete_message(chat_id=message.chat.id, message_id=last_msg_id)
+            await message.bot.edit_message_reply_markup(
+                chat_id=message.chat.id,
+                message_id=last_msg_id,
+                reply_markup=None
+            )
 
         new_message = await message.answer(text='Спасибо!\n\nА теперь введите фамилию',
                                            reply_markup=cancel_kb_inline_user())
@@ -57,10 +62,15 @@ async def process_correct_surname(message: types.Message, state: FSMContext):
     try:
         client_surname = ClientSurnameModel(surname=message.text)
         await state.update_data(client_surname=client_surname.surname)
+        # Удаляем кнопки из предыдущего сообщения
         data = await state.get_data()
         last_msg_id = data.get('last_msg_id')
         if last_msg_id:
-            await message.bot.delete_message(chat_id=message.chat.id, message_id=last_msg_id)
+            await message.bot.edit_message_reply_markup(
+                chat_id=message.chat.id,
+                message_id=last_msg_id,
+                reply_markup=None
+            )
 
             # Отправляем новое сообщение с клавиатурой отмены
         new_message = await message.answer(text='Спасибо!\n\nА теперь введите ваш номер телефона',
