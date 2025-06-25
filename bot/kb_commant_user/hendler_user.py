@@ -4,7 +4,7 @@ from aiogram import Router, types, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
-from aiogram_calendar import SimpleCalendar, SimpleCalendarCallback
+from aiogram_calendar import SimpleCalendar, SimpleCalendarCallback, get_user_locale
 from pydantic import ValidationError
 
 from Config.config import bd
@@ -14,6 +14,11 @@ from bot.FSM.Pandantic_valid import ClientNameModel, ClientSurnameModel, ClientP
 from bot.kb_commant_user.kb_user import check_data, get_time_keyboard, paginate, get_pagination_keyboard, \
     cancel_kb_inline_user
 from bot.main_kb.main_kb import main_kb
+
+
+
+
+
 
 handled_user_router = Router()
 
@@ -86,13 +91,24 @@ async def process_correct_surname(message: Message, state: FSMContext):
     try:
         client_phone = ClientPhoneModel(phone=message.text)
         await state.update_data(client_phone=client_phone.phone)
-        await message.answer(text='Отлично, теперь выберите дату:', reply_markup=await SimpleCalendar().start_calendar())
+        # await message.answer(text='Отлично, теперь выберите дату:', # 1 попытка
+        #                      reply_markup = await SimpleCalendar(
+        #                          locale = await get_user_locale(message.from_user)).start_calendar())
+        # calndar = SimpleCalendar() # 2 попытка
+        # calndar.set_dates_range(
+        #     datetime.now(),
+        #     datetime(datetime.now().year + 1,12,31)
+        # )
+        calendar = SimpleCalendar(locale=await get_user_locale(message.from_user))
+        calendar.set_dates_range(datetime(2025,11,5),datetime(2025,11,25))
+        await message.answer(text='Отлично, теперь выберите дату:',reply_markup= await calendar.start_calendar())
         await state.set_state(Form.appointment_date)
-    except ValidationError as e:
+    except ValidationError:
         await message.answer(f"Номер телефона должен быть в правильном формате!")
 
 @handled_user_router.callback_query(SimpleCalendarCallback.filter(), Form.appointment_date)
 async def process_simple_calendar(callback_query: types.CallbackQuery, callback_data: dict, state: FSMContext):
+
     selected, date = await SimpleCalendar().process_selection(callback_query, callback_data)
     if selected:
         await callback_query.message.answer(text=f"Вы выбрали дату: {date.strftime('%Y-%m-%d')}")
