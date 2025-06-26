@@ -11,6 +11,7 @@ from Config.config import bd
 from bot.Dao.ModelDao import ApplicationDao
 from bot.FSM.FSM_anketa import Form
 from bot.FSM.Pandantic_valid import ClientNameModel, ClientSurnameModel, ClientPhoneModel
+from bot.kb_commant_user.Castom_calendar import CustomCalendar
 from bot.kb_commant_user.kb_user import check_data, get_time_keyboard, paginate, get_pagination_keyboard, \
     cancel_kb_inline_user
 from bot.main_kb.main_kb import main_kb
@@ -85,36 +86,45 @@ async def process_correct_surname(message: types.Message, state: FSMContext):
     except ValidationError as e:
         await message.answer(f"Фамилия должно содержать только буквы")
 
-
+date_range = {
+    'start_date': datetime(2025, 6, 5),
+    'end_date': datetime(2025, 6, 25)
+}
 @handled_user_router.message(Form.client_phone)
 async def process_correct_surname(message: Message, state: FSMContext):
     try:
         client_phone = ClientPhoneModel(phone=message.text)
         await state.update_data(client_phone=client_phone.phone)
-        # await message.answer(text='Отлично, теперь выберите дату:', # 1 попытка
-        #                      reply_markup = await SimpleCalendar(
-        #                          locale = await get_user_locale(message.from_user)).start_calendar())
-        # calndar = SimpleCalendar() # 2 попытка
-        # calndar.set_dates_range(
-        #     datetime.now(),
-        #     datetime(datetime.now().year + 1,12,31)
-        # )
-        calendar = SimpleCalendar(locale=await get_user_locale(message.from_user))
-        calendar.set_dates_range(datetime(2025,11,5),datetime(2025,11,25))
+        calendar = CustomCalendar(locale=await get_user_locale(message.from_user))
+        calendar.set_dates_range(date_range['start_date'],date_range['end_date'])
+
         await message.answer(text='Отлично, теперь выберите дату:',reply_markup= await calendar.start_calendar())
+        await state.update_data(calendar=calendar)
         await state.set_state(Form.appointment_date)
+
     except ValidationError:
         await message.answer(f"Номер телефона должен быть в правильном формате!")
 
 @handled_user_router.callback_query(SimpleCalendarCallback.filter(), Form.appointment_date)
 async def process_simple_calendar(callback_query: types.CallbackQuery, callback_data: dict, state: FSMContext):
+    data = await state.get_data()
+    calendar = data.get('calendar')
 
-    selected, date = await SimpleCalendar().process_selection(callback_query, callback_data)
+    if calendar is None:
+        calendar = CustomCalendar(locale=await get_user_locale(callback_query.from_user))
+        calendar.set_dates_range(date_range['start_date'], date_range['end_date'])
+
+    selected, date = await calendar.process_selection(callback_query, callback_data)
+
     if selected:
-        await callback_query.message.answer(text=f"Вы выбрали дату: {date.strftime('%Y-%m-%d')}")
-        await state.update_data(appointment_date=date.strftime('%Y-%m-%d'))
-        await callback_query.message.answer(text='Отлично, теперь введите время',reply_markup=get_time_keyboard())
-        await state.set_state(Form.appointment_time)
+        if date_range['start_date'] <= date <= date_range['end_date']:
+            await callback_query.message.answer(text=f"Вы выбрали дату: {date.strftime('%Y-%m-%d')}")
+            await state.update_data(appointment_date=date.strftime('%Y-%m-%d'))
+            await callback_query.message.answer(text='Отлично, теперь введите время', reply_markup=get_time_keyboard())
+            await state.set_state(Form.appointment_time)
+        else:
+            await callback_query.answer(text="Вы выбрали дату вне доступного диапазона. Пожалуйста, выберите другую дату.")
+
 
 
 
